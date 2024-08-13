@@ -25,29 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-
-  Future<void> _register() async {
-    final response = await http.post(
-      Uri.parse('https://wallet-api-7m1z.onrender.com/auth/register'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(<String, String>{
-        'username': _usernameController.text,
-        'password': _passwordController.text,
-      }),
-    );
-
-    if (response.statusCode == 201) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Registration successful')),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Registration failed')),
-      );
-    }
-  }
+  bool _obscureText = true; // State variable to toggle password visibility
 
   Future<void> _login() async {
     final response = await http.post(
@@ -121,12 +99,22 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(height: 16),
                 TextFormField(
                   controller: _passwordController,
-                  obscureText: true,
+                  obscureText: _obscureText, // Use the state variable here
                   decoration: InputDecoration(
                     labelText: 'Password',
                     border: OutlineInputBorder(),
                     fillColor: Colors.white,
                     filled: true,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscureText ? Icons.visibility : Icons.visibility_off,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureText = !_obscureText;
+                        });
+                      },
+                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
